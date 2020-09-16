@@ -1,21 +1,18 @@
-Find the repository [on GitHub](https://github.com/fabe/gatsby-universal).
+# A local residential real estate company.
 
-```
-# Installation
-gatsby new my-site https://github.com/fabe/gatsby-universal
 
-# To develop
-yarn develop
+## Contact: 
 
-# To build
-yarn build
+933 Louise Ave #405
+Charlotte, NC 28204
 
-# To test SSR (for Lighthouse etc.)
-yarn ssr
+704-285-1789
 
-# To format JS (precommit)
-yarn format
+## Email
+info@stewproperties.com
 
-# To generate favicons (included in `build`)
-yarn build:favicons
-```
+## Team
+
+
+[James Stewart](https://www.jamestewartjr.com)
+Owner of Stew Properties
