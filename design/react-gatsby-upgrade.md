@@ -355,6 +355,10 @@ export const wrapRootElement = ({ element }) => {
 - ✅ **@reach packages replaced with Radix UI** - **COMPLETED**
 - ✅ **react-helmet removed** (replaced with Gatsby's built-in Head API) - **COMPLETED**
 - ✅ **intersection-observer removed** (polyfill no longer needed) - **COMPLETED**
+- ✅ **io-example component removed** (example component not needed) - **COMPLETED**
+- ✅ **Favicons script fixed** (updated to v7 Promise-based API) - **COMPLETED**
+- ✅ **Next.js config files removed** (leftover from previous migration) - **COMPLETED**
+- ✅ **npm overrides added** (suppress peer dependency warnings) - **COMPLETED**
 - ✅ No unused imports or dependencies remain - **COMPLETED**
 
 ## Timeline Estimate
@@ -384,6 +388,12 @@ export const wrapRootElement = ({ element }) => {
 - Radix UI migration: ~30 minutes
 - ESLint removal: ~15 minutes
 - Location API migration: ~15 minutes
+- react-helmet removal: ~20 minutes
+- intersection-observer removal: ~10 minutes
+- Next.js config cleanup: ~10 minutes
+- Favicons script fix: ~10 minutes
+- io-example component removal: ~5 minutes
+- npm overrides configuration: ~5 minutes
 
 ## Package Cleanup Plan
 
@@ -404,13 +414,14 @@ export const wrapRootElement = ({ element }) => {
 ### Package Usage Summary
 
 **All packages in `package.json` have been verified:**
-- ✅ All `@reach/*` packages are in use
+- ✅ All `@radix-ui/*` packages are in use (replaced @reach packages)
 - ✅ All Gatsby plugins are configured in `gatsby-config.js`
-- ✅ `react-pose` and `gatsby-image` will be replaced (not removed yet)
-- ✅ `intersection-observer` is used as a polyfill in `io/io.js`
+- ✅ `react-pose` and `gatsby-image` have been replaced with `framer-motion` and `gatsby-plugin-image`
+- ✅ `intersection-observer` polyfill removed (no longer needed)
 - ✅ `prop-types` is used extensively throughout components
 - ✅ `styled-components` is used extensively
 - ✅ `directory-named-webpack-plugin` is used in `gatsby-node.js`
+- ✅ `favicons` is used in build script (updated to v7 API)
 
 ## Notes
 
@@ -596,14 +607,34 @@ Before starting implementation:
      - Deleted `next.config.js`
      - Updated `.babelrc`: Changed `"next/babel"` → `"babel-preset-gatsby"`
 
-9. **Added npm overrides for peer dependency warnings**
+9. **Fixed favicons script for v7 API**
+   - **What changed**: Updated `scripts/favicons.js` to use Promise-based API instead of callback-based API
+   - **Why**: 
+     - `favicons` package v7 changed from callback to Promise-based API
+     - Old callback API was causing build failures
+   - **Files changed**:
+     - `scripts/favicons.js`: Converted from `favicons(source, config, callback)` to `favicons(source, config).then().catch()`
+     - Updated configuration to match v7 API (added `appShortName`, `scope`, removed deprecated options)
+
+10. **Removed io-example component**
+   - **What changed**: Removed the IntersectionObserver example component and its files
+   - **Why**: 
+     - Example/demo component not needed in production
+     - User requested removal
+   - **Files changed**:
+     - `src/pages/index.js`: Removed `IOExample` import and usage
+     - Deleted `src/components/io-example/io-example.js`
+     - Deleted `src/components/io-example/io-example.css.js`
+     - Removed `src/components/io-example/` directory
+
+11. **Added npm overrides for peer dependency warnings**
    - **What changed**: Added `overrides` field to `package.json` to suppress `react-server-dom-webpack` peer dependency warnings
    - **Why**: 
      - Gatsby's internal `react-server-dom-webpack` dependency expects experimental React version
      - Gatsby 5 works correctly with React 18.2.0 despite the warning
      - Overrides suppress the warnings without affecting functionality
    - **Files changed**:
-     - `package.json`: Added `overrides` field
+     - `package.json`: Added `overrides` field with `react-server-dom-webpack` override
 
 ### Final Package Versions
 
@@ -628,11 +659,18 @@ Before starting implementation:
 - `intersection-observer` (polyfill no longer needed)
 - All ESLint packages (user requested removal)
 
+**Removed Components:**
+- `io-example` component (example/demo component, not needed in production)
+
 ### Build Status
 
 ✅ **Build Successful**: The application builds successfully with Gatsby 5 and React 18
 ✅ **No Errors**: No build errors or runtime errors
-✅ **No Warnings**: All warnings resolved (removed `gatsby-plugin-react-helmet` warning by using Gatsby's built-in Head API)
+✅ **No Warnings**: All warnings resolved:
+  - Removed `gatsby-plugin-react-helmet` warning by using Gatsby's built-in Head API
+  - Suppressed `react-server-dom-webpack` peer dependency warnings with npm overrides
+✅ **Favicons Generation**: Fixed favicons script to work with v7 API
+✅ **Clean Codebase**: Removed example components and unused files
 
 ### Key Learnings
 
@@ -648,21 +686,15 @@ Before starting implementation:
 
 6. **Next.js Config Files**: Found and removed leftover `next.config.js` and updated `.babelrc` from `next/babel` to `babel-preset-gatsby`. These were from a previous migration attempt and were causing build errors.
 
-6. **Gatsby's Head API**: Gatsby 5's built-in Head API is more efficient than react-helmet. Pages export a `Head` function that returns JSX, which Gatsby automatically injects into the document head. This eliminates the need for the `Helmet` component and provides better integration with Gatsby's build process.
+7. **Gatsby's Head API**: Gatsby 5's built-in Head API is more efficient than react-helmet. Pages export a `Head` function that returns JSX, which Gatsby automatically injects into the document head. This eliminates the need for the `Helmet` component and provides better integration with Gatsby's build process.
 
-7. **Intersection Observer**: Modern browsers (since 2019) have native support for Intersection Observer, making polyfills unnecessary. Removing the polyfill reduces bundle size and simplifies the code.
+8. **Intersection Observer**: Modern browsers (since 2019) have native support for Intersection Observer, making polyfills unnecessary. Removing the polyfill reduces bundle size and simplifies the code.
 
-8. **Peer Dependency Warnings**: Added `overrides` in `package.json` to suppress `react-server-dom-webpack` peer dependency warnings. These warnings occur because Gatsby's internal dependency uses an experimental React version, but Gatsby 5 works correctly with React 18.2.0.
+9. **Favicons v7 API**: The `favicons` package v7 changed from callback-based to Promise-based API. Updated the build script to use the new API to ensure favicon generation works correctly.
 
-9. **Security Vulnerabilities**: Some npm audit vulnerabilities remain because:
-   - Most require breaking changes (downgrading Gatsby from 5.15.0 to 3.3.1)
-   - Some have no fixes available (e.g., `json5` and `xml2js` in `svg-react-loader`)
-   - Many are in deep dependency trees that can't be updated without breaking changes
-   - These vulnerabilities are in development/build-time dependencies and don't affect production runtime
+10. **Peer Dependency Warnings**: Added `overrides` in `package.json` to suppress `react-server-dom-webpack` peer dependency warnings. These warnings occur because Gatsby's internal dependency uses an experimental React version, but Gatsby 5 works correctly with React 18.2.0.
 
-8. **Peer Dependency Warnings**: Added `overrides` in `package.json` to suppress `react-server-dom-webpack` peer dependency warnings. These warnings occur because Gatsby's internal dependency uses an experimental React version, but Gatsby 5 works correctly with React 18.2.0.
-
-9. **Security Vulnerabilities**: Some npm audit vulnerabilities remain because:
+11. **Security Vulnerabilities**: Some npm audit vulnerabilities remain because:
    - Most require breaking changes (downgrading Gatsby from 5.15.0 to 3.3.1)
    - Some have no fixes available (e.g., `json5` and `xml2js` in `svg-react-loader`)
    - Many are in deep dependency trees that can't be updated without breaking changes
