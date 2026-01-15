@@ -1,8 +1,13 @@
 [build]
-  command = "npm install --legacy-peer-deps && npm run build"
+  command = "bash scripts/install-sharp-retry.sh && npm install --legacy-peer-deps && npm run build"
   publish = "public"
 
 [build.environment]
   NODE_VERSION = "20"
   # Ensure sharp uses prebuilt binaries instead of building from source
   SHARP_IGNORE_GLOBAL_LIBVIPS = "1"
+  # Increase timeout and retries for npm operations (in milliseconds)
+  npm_config_fetch_timeout = "300000"
+  npm_config_fetch_retries = "5"
+  npm_config_fetch_retry_mintimeout = "10000"
+  npm_config_fetch_retry_maxtimeout = "60000"
