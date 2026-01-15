@@ -353,6 +353,8 @@ export const wrapRootElement = ({ element }) => {
 - ✅ **Unused dependencies removed** (`gatsby-plugin-webpack-size`, `@reach/router`) - **COMPLETED**
 - ✅ **ESLint removed** (as requested) - **COMPLETED**
 - ✅ **@reach packages replaced with Radix UI** - **COMPLETED**
+- ✅ **react-helmet removed** (replaced with Gatsby's built-in Head API) - **COMPLETED**
+- ✅ **intersection-observer removed** (polyfill no longer needed) - **COMPLETED**
 - ✅ No unused imports or dependencies remain - **COMPLETED**
 
 ## Timeline Estimate
@@ -469,7 +471,6 @@ Before starting implementation:
    - ✅ Upgraded React from `^16.8.6` → `^18.2.0`
    - ✅ Upgraded React-DOM from `^16.8.6` → `^18.2.0`
    - ✅ Updated all Gatsby plugins to v5-compatible versions:
-     - `gatsby-plugin-react-helmet`: `^3.0.12` → `^6.15.0`
      - `gatsby-plugin-styled-components`: `^3.0.7` → `^6.15.0`
      - `gatsby-plugin-sharp`: `^2.0.35` → `^5.15.0`
      - `gatsby-transformer-sharp`: `^2.1.18` → `^5.15.0`
@@ -548,9 +549,7 @@ Before starting implementation:
 4. **Updated additional dependencies**
    - **What changed**: Updated other dependencies to latest compatible versions:
      - `styled-components`: `^4.1.3` → `^6.1.13`
-     - `react-helmet`: `^5.2.0` → `^6.1.0`
      - `prop-types`: `^15.6.2` → `^15.8.1`
-     - `intersection-observer`: `^0.5.1` → `^0.12.2`
      - `babel-plugin-styled-components`: `^1.10.0` → `^2.1.4`
    - **Why**: Ensure compatibility with Gatsby 5 and React 18
 
@@ -564,6 +563,29 @@ Before starting implementation:
      - `node-gyp`: `^3.8.0` → `^10.0.0`
      - `core-js`: `^2.6.2` → `^3.40.0`
    - **Why**: Maintain compatibility and security updates
+
+6. **Removed react-helmet and gatsby-plugin-react-helmet**
+   - **What changed**: Removed `react-helmet` and `gatsby-plugin-react-helmet` packages, replaced with Gatsby's built-in Head API
+   - **Why**: 
+     - Gatsby 5 has built-in Head API that's more efficient
+     - Reduces dependencies and eliminates warnings
+     - Better integration with Gatsby's build process
+   - **Files changed**:
+     - `package.json`: Removed `react-helmet` and `gatsby-plugin-react-helmet`
+     - `gatsby-config.js`: Removed `gatsby-plugin-react-helmet` plugin
+     - `src/components/head/head.js`: Converted from `Helmet` component to JSX fragments compatible with Gatsby's Head export
+     - `src/pages/index.js`, `src/pages/about.js`, `src/pages/404.js`: Added `Head` exports using Gatsby's Head API
+     - `src/components/layout/layout.js`: Removed Head component usage (now handled by page Head exports)
+
+7. **Removed intersection-observer polyfill**
+   - **What changed**: Removed `intersection-observer` package and polyfill code
+   - **Why**: 
+     - Intersection Observer is widely supported (baseline since 2019)
+     - No longer needs polyfill for modern browsers
+     - Reduces bundle size and dependencies
+   - **Files changed**:
+     - `package.json`: Removed `intersection-observer`
+     - `src/components/io/io.js`: Removed polyfill import and related code
 
 ### Final Package Versions
 
@@ -583,13 +605,16 @@ Before starting implementation:
 - `gatsby-image` (replaced with `gatsby-plugin-image`)
 - `react-pose` (replaced with `framer-motion`)
 - `gatsby-plugin-webpack-size` (unused)
+- `gatsby-plugin-react-helmet` (replaced with Gatsby's built-in Head API)
+- `react-helmet` (replaced with Gatsby's built-in Head API)
+- `intersection-observer` (polyfill no longer needed)
 - All ESLint packages (user requested removal)
 
 ### Build Status
 
 ✅ **Build Successful**: The application builds successfully with Gatsby 5 and React 18
 ✅ **No Errors**: No build errors or runtime errors
-✅ **No Warnings**: Only one informational warning about `gatsby-plugin-react-helmet` (optional, can be removed later)
+✅ **No Warnings**: All warnings resolved (removed `gatsby-plugin-react-helmet` warning by using Gatsby's built-in Head API)
 
 ### Key Learnings
 
@@ -603,8 +628,6 @@ Before starting implementation:
 
 5. **Dependency Conflicts**: Using `--legacy-peer-deps` was necessary for some packages during installation, but the build works correctly.
 
-### Next Steps (Optional)
+6. **Gatsby's Head API**: Gatsby 5's built-in Head API is more efficient than react-helmet. Pages export a `Head` function that returns JSX, which Gatsby automatically injects into the document head. This eliminates the need for the `Helmet` component and provides better integration with Gatsby's build process.
 
-- Consider removing `gatsby-plugin-react-helmet` warning by using Gatsby's built-in head API
-- Consider removing `intersection-observer` polyfill (Intersection Observer is widely supported now)
-- Consider updating favicons script if needed (currently has compatibility issues with newer `favicons` package)
+7. **Intersection Observer**: Modern browsers (since 2019) have native support for Intersection Observer, making polyfills unnecessary. Removing the polyfill reduces bundle size and simplifies the code.
