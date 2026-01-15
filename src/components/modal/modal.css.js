@@ -43,5 +43,16 @@ export const Close = styled.button`
   position: absolute;
   top: 0;
   right: 0;
-  color: #fff;
+  color: #757575;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #000;
+  }
+
+  &:focus {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
 `;

@@ -1,4 +1,4 @@
-const favicons = require('favicons');
+const { favicons } = require('favicons');
 const path = require('path');
 const fs = require('fs');
 
@@ -10,25 +10,24 @@ const {
 
 const dir = path.resolve(__dirname, '../public/icons/');
 if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir);
+  fs.mkdirSync(dir, { recursive: true });
 }
 
 const source = 'src/images/icon.png';
 const configuration = {
   path: '/icons/',
   appName: siteTitleShort,
+  appShortName: siteTitleShort,
   appDescription: null,
   developerName: null,
   developerURL: null,
-  dir: 'auto',
-  lang: 'en-US',
   background: backgroundColor,
   theme_color: themeColor,
   display: 'standalone',
   orientation: 'any',
+  scope: '/',
   start_url: '/',
   version: '1.0',
-  logging: true,
   icons: {
     android: true,
     appleIcon: true,
@@ -41,35 +40,37 @@ const configuration = {
   },
 };
 
-const callback = function(err, res) {
-  if (err) {
-    console.log(err.message);
-    return;
-  }
-
-  res.images.forEach(image => {
-    fs.writeFile(
-      path.resolve(__dirname, '../public/icons/', image.name),
-      image.contents,
-      err => {
-        if (err) {
-          console.log(err);
+favicons(source, configuration)
+  .then(response => {
+    // Write image files
+    response.images.forEach(image => {
+      fs.writeFile(
+        path.resolve(__dirname, '../public/icons/', image.name),
+        image.contents,
+        err => {
+          if (err) {
+            console.error(`Error writing ${image.name}:`, err);
+          }
         }
-      }
-    );
-  });
+      );
+    });
 
-  res.files.forEach(file => {
-    fs.writeFile(
-      path.resolve(__dirname, '../public/', file.name),
-      file.contents,
-      err => {
-        if (err) {
-          console.log(err);
+    // Write other files (like manifest.json, etc.)
+    response.files.forEach(file => {
+      fs.writeFile(
+        path.resolve(__dirname, '../public/', file.name),
+        file.contents,
+        err => {
+          if (err) {
+            console.error(`Error writing ${file.name}:`, err);
+          }
         }
-      }
-    );
-  });
-};
+      );
+    });
 
-favicons(source, configuration, callback);
+    console.log('Favicons generated successfully');
+  })
+  .catch(error => {
+    console.error('Error generating favicons:', error.message);
+    process.exit(1);
+  });

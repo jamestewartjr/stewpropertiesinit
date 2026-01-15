@@ -55,21 +55,14 @@ export default class IO extends Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     // Default values
     let isVisible = true;
     let hasBeenVisible = true;
     let IOSupported = false;
 
-    // Intersection Observer polyfill
-    if (typeof window !== 'undefined' && !window.IntersectionObserver) {
-      await import('intersection-observer').then(() => {
-        // eslint-disable-next-line no-console
-        console.log('IntersectionObserver polyfill injected.');
-      });
-    }
-
-    // Check if browser (now) supports IntersectionObserver
+    // Check if browser supports IntersectionObserver
+    // Intersection Observer is widely supported (baseline since 2019), no polyfill needed
     if (typeof window !== 'undefined' && window.IntersectionObserver) {
       isVisible = false;
       hasBeenVisible = false;

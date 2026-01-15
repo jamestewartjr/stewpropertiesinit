@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet';
-import { StaticQuery, graphql } from 'gatsby';
-import { Location } from '@reach/router';
+import { useStaticQuery, graphql } from 'gatsby';
+import { useLocation } from '@gatsbyjs/reach-router';
 import schemaGenerator from 'helpers/schemaGenerator';
 
-const Head = ({
+const HeadContent = ({
   siteTitle,
   siteDescription,
   siteUrl,
@@ -17,7 +16,7 @@ const Head = ({
   location,
   canonical = siteUrl + (location.pathname || ''),
 }) => (
-  <Helmet>
+  <>
     <html lang="en" />
 
     <meta content="IE=edge" httpEquiv="X-UA-Compatible" />
@@ -162,10 +161,10 @@ const Head = ({
         })
       )}
     </script>
-  </Helmet>
+  </>
 );
 
-Head.propTypes = {
+HeadContent.propTypes = {
   siteTitle: PropTypes.string,
   siteTitleShort: PropTypes.string,
   siteDescription: PropTypes.string,
@@ -179,32 +178,51 @@ Head.propTypes = {
   location: PropTypes.object.isRequired,
 };
 
-const HeadWithQuery = props => (
-  <StaticQuery
-    query={graphql`
-      query {
-        site {
-          siteMetadata {
-            siteTitle
-            siteTitleShort
-            siteDescription
-            siteUrl
-            themeColor
-            social {
-              twitter
-            }
+// Component for use in Layout (backwards compatibility)
+const Head = props => {
+  const location = useLocation();
+  const data = useStaticQuery(graphql`
+    query {
+      site {
+        siteMetadata {
+          siteTitle
+          siteTitleShort
+          siteDescription
+          siteUrl
+          themeColor
+          social {
+            twitter
           }
         }
       }
-    `}
-    render={data => (
-      <Location>
-        {({ location }) => (
-          <Head {...data.site.siteMetadata} {...props} location={location} />
-        )}
-      </Location>
-    )}
-  />
-);
+    }
+  `);
 
-export default HeadWithQuery;
+  return <HeadContent {...data.site.siteMetadata} {...props} location={location} />;
+};
+
+// Hook for use in pages with Gatsby's Head export
+export const useHeadData = () => {
+  const location = useLocation();
+  const data = useStaticQuery(graphql`
+    query {
+      site {
+        siteMetadata {
+          siteTitle
+          siteTitleShort
+          siteDescription
+          siteUrl
+          themeColor
+          social {
+            twitter
+          }
+        }
+      }
+    }
+  `);
+
+  return { ...data.site.siteMetadata, location };
+};
+
+export { HeadContent };
+export default Head;
