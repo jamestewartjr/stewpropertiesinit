@@ -54,6 +54,46 @@
   "overrides": {
     "react-server-dom-webpack": {
       "react": "^18.2.0"
+    },
+    "ajv": "^8.17.1",
+    "babel-loader": {
+      "ajv": "^6.12.6"
+    },
+    "mini-css-extract-plugin": {
+      "ajv": "^6.12.6"
+    },
+    "eslint-webpack-plugin": {
+      "ajv": "^6.12.6"
+    },
+    "css-loader": {
+      "ajv": "^6.12.6"
+    },
+    "css-minimizer-webpack-plugin": {
+      "ajv": "^6.12.6"
+    },
+    "file-loader": {
+      "ajv": "^6.12.6"
+    },
+    "fork-ts-checker-webpack-plugin": {
+      "ajv": "^6.12.6"
+    },
+    "null-loader": {
+      "ajv": "^6.12.6"
+    },
+    "raw-loader": {
+      "ajv": "^6.12.6"
+    },
+    "style-loader": {
+      "ajv": "^6.12.6"
+    },
+    "url-loader": {
+      "ajv": "^6.12.6"
+    },
+    "@eslint/eslintrc": {
+      "ajv": "^6.12.6"
+    },
+    "eslint": {
+      "ajv": "^6.12.6"
     }
   }
 }
