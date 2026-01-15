@@ -64,7 +64,6 @@ export default class IO extends Component {
     // Intersection Observer polyfill
     if (typeof window !== 'undefined' && !window.IntersectionObserver) {
       await import('intersection-observer').then(() => {
-        // eslint-disable-next-line no-console
         console.log('IntersectionObserver polyfill injected.');
       });
     }
