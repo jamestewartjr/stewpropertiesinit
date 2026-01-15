@@ -1,0 +1,8 @@
+[build]
+  command = "npm install --legacy-peer-deps && npm run build"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Ensure sharp uses prebuilt binaries instead of building from source
+  SHARP_IGNORE_GLOBAL_LIBVIPS = "1"

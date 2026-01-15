@@ -1,6 +1,6 @@
 {
   "name": "gatsby-universal",
-  "license": "MIT",
+
   "author": "Fabian Schultz <desk@fabianschultz.com>",
   "scripts": {
     "develop": "gatsby develop",
