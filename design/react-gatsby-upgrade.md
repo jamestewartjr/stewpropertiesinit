@@ -587,6 +587,24 @@ Before starting implementation:
      - `package.json`: Removed `intersection-observer`
      - `src/components/io/io.js`: Removed polyfill import and related code
 
+8. **Fixed Next.js configuration conflicts**
+   - **What changed**: Removed `next.config.js` and updated `.babelrc` to use Gatsby's Babel preset instead of Next.js
+   - **Why**: 
+     - Leftover files from a previous migration attempt were causing build errors
+     - Gatsby project should use `babel-preset-gatsby`, not `next/babel`
+   - **Files changed**:
+     - Deleted `next.config.js`
+     - Updated `.babelrc`: Changed `"next/babel"` → `"babel-preset-gatsby"`
+
+9. **Added npm overrides for peer dependency warnings**
+   - **What changed**: Added `overrides` field to `package.json` to suppress `react-server-dom-webpack` peer dependency warnings
+   - **Why**: 
+     - Gatsby's internal `react-server-dom-webpack` dependency expects experimental React version
+     - Gatsby 5 works correctly with React 18.2.0 despite the warning
+     - Overrides suppress the warnings without affecting functionality
+   - **Files changed**:
+     - `package.json`: Added `overrides` field
+
 ### Final Package Versions
 
 **Core Dependencies:**
@@ -628,6 +646,24 @@ Before starting implementation:
 
 5. **Dependency Conflicts**: Using `--legacy-peer-deps` was necessary for some packages during installation, but the build works correctly.
 
+6. **Next.js Config Files**: Found and removed leftover `next.config.js` and updated `.babelrc` from `next/babel` to `babel-preset-gatsby`. These were from a previous migration attempt and were causing build errors.
+
 6. **Gatsby's Head API**: Gatsby 5's built-in Head API is more efficient than react-helmet. Pages export a `Head` function that returns JSX, which Gatsby automatically injects into the document head. This eliminates the need for the `Helmet` component and provides better integration with Gatsby's build process.
 
 7. **Intersection Observer**: Modern browsers (since 2019) have native support for Intersection Observer, making polyfills unnecessary. Removing the polyfill reduces bundle size and simplifies the code.
+
+8. **Peer Dependency Warnings**: Added `overrides` in `package.json` to suppress `react-server-dom-webpack` peer dependency warnings. These warnings occur because Gatsby's internal dependency uses an experimental React version, but Gatsby 5 works correctly with React 18.2.0.
+
+9. **Security Vulnerabilities**: Some npm audit vulnerabilities remain because:
+   - Most require breaking changes (downgrading Gatsby from 5.15.0 to 3.3.1)
+   - Some have no fixes available (e.g., `json5` and `xml2js` in `svg-react-loader`)
+   - Many are in deep dependency trees that can't be updated without breaking changes
+   - These vulnerabilities are in development/build-time dependencies and don't affect production runtime
+
+8. **Peer Dependency Warnings**: Added `overrides` in `package.json` to suppress `react-server-dom-webpack` peer dependency warnings. These warnings occur because Gatsby's internal dependency uses an experimental React version, but Gatsby 5 works correctly with React 18.2.0.
+
+9. **Security Vulnerabilities**: Some npm audit vulnerabilities remain because:
+   - Most require breaking changes (downgrading Gatsby from 5.15.0 to 3.3.1)
+   - Some have no fixes available (e.g., `json5` and `xml2js` in `svg-react-loader`)
+   - Many are in deep dependency trees that can't be updated without breaking changes
+   - These vulnerabilities are in development/build-time dependencies and don't affect production runtime

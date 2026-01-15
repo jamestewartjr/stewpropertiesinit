@@ -4,7 +4,6 @@ import Layout from 'components/layout';
 import Box from 'components/box';
 import Title from 'components/title';
 import Gallery from 'components/gallery';
-import IOExample from 'components/io-example';
 import Modal from 'containers/modal';
 import { graphql, useStaticQuery } from 'gatsby';
 import { useLocation } from '@gatsbyjs/reach-router';
@@ -27,8 +26,6 @@ const Index = ({ data }) => (
       </Modal> */}
     </Box>
     <Gallery items={data.homeJson.gallery} />
-    <div style={{ height: '50vh' }} />
-    <IOExample />
   </Layout>
 );
 
